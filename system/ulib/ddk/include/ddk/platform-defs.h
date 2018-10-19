@@ -149,4 +149,8 @@ __BEGIN_CDECLS;
 #define PDEV_VID_SONY               14
 #define PDEV_PID_SONY_IMX227        1
 
+// Qualcomm
+#define PDEV_VID_QUALCOMM           15
+#define PDEV_PID_QUALCOMM_MSM8X53    1
+
 __END_CDECLS;
