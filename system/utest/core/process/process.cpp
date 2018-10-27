@@ -318,10 +318,3 @@ RUN_TEST_ENABLE_CRASH_HANDLER(kill_process_via_vmar_destroy);
 RUN_TEST(kill_channel_handle_cycle);
 RUN_TEST(info_reflects_process_state);
 END_TEST_CASE(process_tests)
-
-#ifndef BUILD_COMBINED_TESTS
-int main(int argc, char** argv) {
-    bool success = unittest_run_all_tests(argc, argv);
-    return success ? 0 : -1;
-}
-#endif

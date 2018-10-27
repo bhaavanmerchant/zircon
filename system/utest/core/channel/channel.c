@@ -1043,9 +1043,3 @@ RUN_TEST(channel_disallow_write_to_self)
 RUN_TEST(channel_read_etc)
 RUN_TEST(channel_write_different_sizes)
 END_TEST_CASE(channel_tests)
-
-#ifndef BUILD_COMBINED_TESTS
-int main(int argc, char** argv) {
-    return unittest_run_all_tests(argc, argv) ? 0 : -1;
-}
-#endif
