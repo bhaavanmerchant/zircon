@@ -4,6 +4,7 @@
 
 #include <ctype.h>
 #include <fcntl.h>
+#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -34,6 +35,7 @@
 #include <lib/zx/resource.h>
 #include <lib/zx/vmo.h>
 
+#include "devcoordinator.h"
 #include "devmgr.h"
 #include "../shared/fdio.h"
 
@@ -544,10 +546,53 @@ void fetch_root_resource() {
 
 } // namespace devmgr
 
+namespace {
+
+// Values parsed out of argv
+struct DevmgrArgs {
+    const char* driver_search_path = nullptr;
+    const char* sys_device_driver = nullptr;
+};
+
+void ParseArgs(int argc, char** argv, DevmgrArgs* out) {
+    enum {
+        kDriverSearchPath,
+        kSysDeviceDriver,
+    };
+    option options[] = {
+        { "driver-search-path", required_argument, nullptr, kDriverSearchPath },
+        { "sys-device-driver", required_argument, nullptr, kSysDeviceDriver },
+    };
+
+    int opt;
+    while ((opt = getopt_long(argc, argv, "", options, nullptr)) != -1) {
+        switch (opt) {
+            case kDriverSearchPath:
+                out->driver_search_path = optarg;
+                break;
+            case kSysDeviceDriver:
+                out->sys_device_driver = optarg;
+                break;
+            default:
+                printf("devmgr: unknown argument: %s\n", argv[optind-1]);
+                printf("devmgr: supported arguments:\n");
+                for (const auto& option : options) {
+                    printf("  --%s\n", option.name);
+                }
+                exit(1);
+        }
+    }
+}
+
+} // namespace
+
 int main(int argc, char** argv) {
     using namespace devmgr;
 
     printf("devmgr: main()\n");
+
+    DevmgrArgs args;
+    ParseArgs(argc, argv, &args);
 
     fetch_root_resource();
 
@@ -599,7 +644,7 @@ int main(int argc, char** argv) {
         thrd_detach(t);
     }
 
-    coordinator();
+    coordinator(args.driver_search_path, args.sys_device_driver);
     printf("devmgr: coordinator exited?!\n");
     return 0;
 }
