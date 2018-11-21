@@ -600,6 +600,13 @@ int main(int argc, char** argv) {
 
     devfs_init(*root_job_handle);
 
+    // Check if whatever launched devmgr gave a channel to be connected to /dev.
+    // This is for use in tests to let the test environment see devfs.
+    zx::channel devfs_client(zx_take_startup_handle(PA_HND(PA_USER1, 0)));
+    if (devfs_client.is_valid()) {
+        fdio_service_clone_to(devfs_root_borrow()->get(), devfs_client.release());
+    }
+
     root_job_handle->set_property(ZX_PROP_NAME, "root", 4);
 
     zx_status_t status = zx::job::create(*root_job_handle, 0u, &svcs_job_handle);
